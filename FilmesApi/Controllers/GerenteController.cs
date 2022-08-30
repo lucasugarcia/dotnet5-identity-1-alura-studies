@@ -2,6 +2,7 @@
 using FilmesAPI.Data;
 using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
+using FilmesAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,22 +15,18 @@ namespace FilmesAPI.Controllers
     [Route("[controller]")]
     public class GerenteController : ControllerBase
     {
-        private AppDbContext _context;
+        private GerenteService _gerenteService;
         private IMapper _mapper;
 
-        public GerenteController(AppDbContext context, IMapper mapper)
+        public GerenteController(GerenteService gerenteService)
         {
-            _context = context;
-            _mapper = mapper;
+            _gerenteService = gerenteService;
         }
 
         [HttpPost]
         public IActionResult AdicionaGerente(CreateGerenteDto gerenteDto)
         {
-            var gerente = _mapper.Map<Gerente>(gerenteDto);
-
-            _context.Gerentes.Add(gerente);
-            _context.SaveChanges();
+            var gerente = _gerenteService.AdicionaGerente(gerenteDto);
 
             return CreatedAtAction(nameof(RecuperarGerentePorId), new { Id = gerente.Id }, gerente);
         }
@@ -37,26 +34,21 @@ namespace FilmesAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult RecuperarGerentePorId(int id)
         {
-            var gerente = _context.Gerentes.FirstOrDefault(g => g.Id == id);
+            var gerente = _gerenteService.RecuperarGerentePorId(id);
 
             if (gerente == null)
                 return NotFound();
 
-            var gerenteDto = _mapper.Map<ReadGerenteDto>(gerente);
-
-            return Ok(gerenteDto);
+            return Ok(gerente);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeletarGerente(int id)
         {
-            var gerente = _context.Gerentes.FirstOrDefault(g => g.Id == id);
+            var resultado = _gerenteService.DeletarGerente(id);
 
-            if (gerente == null)
+            if (resultado.IsFailed)
                 return NotFound();
-
-            _context.Remove(gerente);
-            _context.SaveChanges();
 
             return NoContent();
         }
