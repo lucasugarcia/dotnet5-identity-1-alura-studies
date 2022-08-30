@@ -1,8 +1,7 @@
-﻿using FilmesApi.Models;
-using FilmesAPI.Models;
+﻿using FilmesAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FilmesApi.Data
+namespace FilmesAPI.Data
 {
     public class AppDbContext : DbContext
     {
@@ -32,7 +31,6 @@ namespace FilmesApi.Data
                 .HasOne(sessao => sessao.Cinema)
                 .WithMany(cinema => cinema.Sessoes)
                 .HasForeignKey(sessao => sessao.CinemaId);
-
         }
 
         public DbSet<Filme> Filmes { get; set; }

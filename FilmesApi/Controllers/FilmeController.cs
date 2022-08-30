@@ -1,16 +1,11 @@
-﻿
-using AutoMapper;
-using FilmesApi.Data;
-using FilmesApi.Services;
+﻿using AutoMapper;
 using FilmesAPI.Data;
 using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FilmesAPI.Controllers
 {
@@ -18,52 +13,84 @@ namespace FilmesAPI.Controllers
     [Route("[controller]")]
     public class FilmeController : ControllerBase
     {
-        private FilmeService _filmeService;
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public FilmeController(FilmeService filmeService)
+        public FilmeController(AppDbContext context, IMapper mapper)
         {
-            _filmeService = filmeService;
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public IActionResult AdicionaFilme([FromBody] CreateFilmeDto filmeDto)
+        public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto)
         {
-            ReadFilmeDto readDto = _filmeService.AdicionaFilme(filmeDto);
-            return CreatedAtAction(nameof(RecuperaFilmesPorId), new { Id = readDto.Id }, readDto);
+            var filme = _mapper.Map<Filme>(filmeDto);
+
+            _context.Filmes.Add(filme);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(RecuperarFilmePorId), new { id = filme.Id }, filme);
         }
 
         [HttpGet]
-        public IActionResult RecuperaFilmes([FromQuery] int? classificacaoEtaria = null)
+        public IActionResult RecuperarFilmes([FromQuery] int? classificacaoEtaria = null)
         {
-            List<ReadFilmeDto> readDto = _filmeService.RecuperaFilmes(classificacaoEtaria);
-            if (readDto == null) return NotFound();
-            return Ok(readDto);
+            List<Filme> filmes;
+
+            if (classificacaoEtaria != null)
+                filmes = _context.Filmes.Where(f => f.ClassificacaoEtaria <= classificacaoEtaria).ToList();
+            else
+                filmes = _context.Filmes.ToList();
+
+            if (filmes == null)
+                return NotFound();
+
+            var filmesDto = _mapper.Map<List<ReadFilmeDto>>(filmes);
+
+            return Ok(filmesDto);
         }
 
         [HttpGet("{id}")]
-        public IActionResult RecuperaFilmesPorId(int id)
+        public IActionResult RecuperarFilmePorId(int id)
         {
-            ReadFilmeDto readDto = _filmeService.RecuperaFilmesPorId(id);
-            if (readDto == null) return NotFound();
-            return Ok(readDto);
-            
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
+
+            if (filme == null)
+                return NotFound();
+
+            var filmeDto = _mapper.Map<ReadFilmeDto>(filme);
+
+            return Ok(filme);
         }
 
         [HttpPut("{id}")]
-        public IActionResult AtualizaFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
+        public IActionResult AtualizarFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
         {
-            Result resultado = _filmeService.AtualizaFilme(id, filmeDto);
-            if (resultado.IsFailed) return NotFound();
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
+
+            if (filme == null)
+                return NotFound();
+
+            _mapper.Map(filmeDto, filme);
+
+            _context.SaveChanges();
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletaFilme(int id)
+        public IActionResult DeletarFilme(int id)
         {
-            Result resultado = _filmeService.DeletaFilme(id);
-            if (resultado.IsFailed) return NotFound();
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == id);
+
+            if (filme == null)
+                return NotFound();
+
+            _context.Remove(filme);
+            _context.SaveChanges();
+
             return NoContent();
         }
-
     }
 }

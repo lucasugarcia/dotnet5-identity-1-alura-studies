@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
-namespace FilmesApi.Data.Dtos.Sessao
+namespace FilmesAPI.Data.Dtos
 {
     public class CreateSessaoDto
     {

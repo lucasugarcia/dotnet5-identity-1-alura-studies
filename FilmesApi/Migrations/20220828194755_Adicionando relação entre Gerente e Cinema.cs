@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using MySql.EntityFrameworkCore.Metadata;
 
-namespace FilmesApi.Migrations
+namespace FilmesAPI.Migrations
 {
     public partial class AdicionandorelaçãoentreGerenteeCinema : Migration
     {

@@ -1,48 +1,63 @@
 ﻿using AutoMapper;
-using FilmesApi.Data;
-using FilmesApi.Data.Dtos.Gerente;
-using FilmesApi.Models;
-using FilmesApi.Services;
-using FluentResults;
+using FilmesAPI.Data;
+using FilmesAPI.Data.Dtos;
+using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FilmesApi.Controllers
+namespace FilmesAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class GerenteController : ControllerBase
     {
-        private GerenteService _gerenteService;
+        private AppDbContext _context;
+        private IMapper _mapper;
 
-        public GerenteController(GerenteService gerenteService)
+        public GerenteController(AppDbContext context, IMapper mapper)
         {
-            _gerenteService = gerenteService;
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public IActionResult AdicionaGerente(CreateGerenteDto dto)
+        public IActionResult AdicionaGerente(CreateGerenteDto gerenteDto)
         {
-            ReadGerenteDto readDto = _gerenteService.AdicionaGerente(dto);
-            return CreatedAtAction(nameof(RecuperaGerentesPorId), new { Id = readDto.Id }, readDto);
+            var gerente = _mapper.Map<Gerente>(gerenteDto);
+
+            _context.Gerentes.Add(gerente);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(RecuperarGerentePorId), new { Id = gerente.Id }, gerente);
         }
 
         [HttpGet("{id}")]
-        public IActionResult RecuperaGerentesPorId(int id)
+        public IActionResult RecuperarGerentePorId(int id)
         {
-            ReadGerenteDto readDto = _gerenteService.RecuperaGerentesPorId(id);
-            if (readDto == null) return NotFound();
-            return Ok(readDto);
+            var gerente = _context.Gerentes.FirstOrDefault(g => g.Id == id);
+
+            if (gerente == null)
+                return NotFound();
+
+            var gerenteDto = _mapper.Map<ReadGerenteDto>(gerente);
+
+            return Ok(gerenteDto);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletaGerente(int id)
+        public IActionResult DeletarGerente(int id)
         {
-            Result resultado = _gerenteService.DeleteGerente(id);
-            if (resultado.IsFailed) return NotFound();
+            var gerente = _context.Gerentes.FirstOrDefault(g => g.Id == id);
+
+            if (gerente == null)
+                return NotFound();
+
+            _context.Remove(gerente);
+            _context.SaveChanges();
+
             return NoContent();
         }
     }

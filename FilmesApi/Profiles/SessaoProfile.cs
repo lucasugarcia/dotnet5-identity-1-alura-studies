@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using FilmesApi.Data.Dtos.Sessao;
-using FilmesApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FilmesAPI.Data.Dtos;
+using FilmesAPI.Models;
 
-namespace FilmesApi.Profiles
+namespace FilmesAPI.Profiles
 {
     public class SessaoProfile : Profile
     {
@@ -14,9 +10,8 @@ namespace FilmesApi.Profiles
         {
             CreateMap<CreateSessaoDto, Sessao>();
             CreateMap<Sessao, ReadSessaoDto>()
-                .ForMember(dto => dto.HorarioDeInicio, opts => opts
-                .MapFrom(dto =>
-                dto.HorarioDeEncerramento.AddMinutes(dto.Filme.Duracao * (-1))));
+                .ForMember(sessao => sessao.HorarioDeEncerramento, opts => opts
+                .MapFrom(sessao => sessao.HorarioDeEncerramento.AddMinutes(-sessao.Filme.Duracao)));
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FilmesApi.Data.Dtos.Gerente
+namespace FilmesAPI.Data.Dtos
 {
     public class ReadGerenteDto
     {

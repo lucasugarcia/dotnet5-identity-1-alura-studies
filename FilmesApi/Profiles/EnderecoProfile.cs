@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using FilmesApi.Models;
 using FilmesAPI.Data.Dtos;
+using FilmesAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FilmesApi.Profiles
+namespace FilmesAPI.Profiles
 {
     public class EnderecoProfile : Profile
     {
