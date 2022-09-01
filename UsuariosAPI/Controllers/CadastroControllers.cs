@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UsuariosAPI.Data.Dtos;
+using UsuariosAPI.Services;
 
 namespace UsuariosAPI.Controllers
 {
@@ -11,9 +13,21 @@ namespace UsuariosAPI.Controllers
     [ApiController]
     public class CadastroControllers :ControllerBase
     {
-        [HttpPost]
-        public IActionResult CadastraUsuario(CreateUsuarioDto createDto)
+        private CadastroService _cadastroService;
+
+        public CadastroControllers(CadastroService cadastroService)
         {
+            _cadastroService = cadastroService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CadastrarUsuario(CreateUsuarioDto createDto)
+        {
+            var resultado = await _cadastroService.CadastrarUsuario(createDto);
+
+            if (resultado.IsFailed)
+                return StatusCode(500);
+
             return Ok();
         }
     }
