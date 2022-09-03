@@ -26,9 +26,9 @@ namespace UsuariosAPI.Controllers
             var resultado = await _loginService.LogarUsuario(request);
 
             if (resultado.IsFailed)
-                return Unauthorized();
+                return Unauthorized(resultado.Errors);
 
-            return Ok();
+            return Ok(resultado.Successes);
         }
     }
 }

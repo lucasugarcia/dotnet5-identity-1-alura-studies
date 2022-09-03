@@ -11,10 +11,12 @@ namespace UsuariosAPI.Services
     public class LoginService
     {
         private SignInManager<IdentityUser<int>> _signInManager;
+        private TokenService _tokenService;
 
-        public LoginService(SignInManager<IdentityUser<int>> signInManager)
+        public LoginService(SignInManager<IdentityUser<int>> signInManager, TokenService tokenService)
         {
             _signInManager = signInManager;
+            _tokenService = tokenService;
         }
 
         public async Task<Result> LogarUsuario(LoginRequest request)
@@ -22,7 +24,14 @@ namespace UsuariosAPI.Services
             var resultadoIdentity = await _signInManager.PasswordSignInAsync(request.Username, request.Password, false, false);
 
             if (resultadoIdentity.Succeeded)
-                return Result.Ok();
+            {
+                var identityUser = _signInManager.UserManager.Users
+                    .FirstOrDefault(u => u.NormalizedUserName == request.Username.ToUpper());
+
+                var token = _tokenService.CreateToken(identityUser);
+
+                return Result.Ok().WithSuccess(token.Value);
+            }
 
             return Result.Fail("Login falhou");
         }
