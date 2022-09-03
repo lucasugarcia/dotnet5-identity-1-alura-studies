@@ -30,7 +30,6 @@ namespace UsuariosAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddDbContext<UserDbContext>(options =>
                 options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection"))
             );
@@ -41,6 +40,7 @@ namespace UsuariosAPI
             services.AddScoped<CadastroService, CadastroService>();
             services.AddScoped<LoginService, LoginService>();
             services.AddScoped<TokenService, TokenService>();
+            services.AddScoped<LogoutService, LogoutService>();
 
             services.AddControllers();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
