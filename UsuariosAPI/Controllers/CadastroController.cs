@@ -11,11 +11,11 @@ namespace UsuariosAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class CadastroControllers :ControllerBase
+    public class CadastroController : ControllerBase
     {
         private CadastroService _cadastroService;
 
-        public CadastroControllers(CadastroService cadastroService)
+        public CadastroController(CadastroService cadastroService)
         {
             _cadastroService = cadastroService;
         }
