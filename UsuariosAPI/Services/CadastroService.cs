@@ -15,11 +15,13 @@ namespace UsuariosAPI.Services
     {
         private IMapper _mapper;
         private UserManager<IdentityUser<int>> _userManager;
+        private EmailService _emailService;
 
-        public CadastroService(IMapper mapper, UserManager<IdentityUser<int>> userManager)
+        public CadastroService(IMapper mapper, UserManager<IdentityUser<int>> userManager, EmailService emailService)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public async Task<Result> CadastrarUsuario(CreateUsuarioDto createDto)
@@ -33,6 +35,8 @@ namespace UsuariosAPI.Services
             if (resultadoIdentity.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(usuarioIdentity);
+
+                _emailService.EnviarEmail(new[] { usuarioIdentity.Email }, "Link de Ativação", usuarioIdentity.Id, code);
 
                 return Result.Ok().WithSuccess(code);
             }
