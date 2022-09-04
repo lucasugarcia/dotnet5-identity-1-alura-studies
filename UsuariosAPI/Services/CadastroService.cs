@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UsuariosAPI.Data.Dtos;
+using UsuariosAPI.Data.Requests;
 using UsuariosAPI.Models;
 
 namespace UsuariosAPI.Services
@@ -21,7 +22,7 @@ namespace UsuariosAPI.Services
             _userManager = userManager;
         }
 
-        internal async Task<Result> CadastrarUsuario(CreateUsuarioDto createDto)
+        public async Task<Result> CadastrarUsuario(CreateUsuarioDto createDto)
         {
             var usuario = _mapper.Map<Usuario>(createDto);
 
@@ -30,9 +31,26 @@ namespace UsuariosAPI.Services
             var resultadoIdentity = await _userManager.CreateAsync(usuarioIdentity, createDto.Password);
 
             if (resultadoIdentity.Succeeded)
-                return Result.Ok();
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(usuarioIdentity);
+
+                return Result.Ok().WithSuccess(code);
+            }
 
             return Result.Fail("Houve uma falha ao cadastrar o usuário");
+        }
+
+        public async Task<Result> AtivarContaUsuario(AtivaContaRequest request)
+        {
+            var identityUser = _userManager.Users
+                .FirstOrDefault(u => u.Id == request.UsuarioId);
+
+            var identityResult = await _userManager.ConfirmEmailAsync(identityUser, request.CodigoDeAtivacao);
+
+            if (identityResult.Succeeded)
+                return Result.Ok();
+
+            return Result.Fail("Falha ao ativar conta de usuário");
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UsuariosAPI.Data.Dtos;
+using UsuariosAPI.Data.Requests;
 using UsuariosAPI.Services;
 
 namespace UsuariosAPI.Controllers
@@ -28,7 +29,18 @@ namespace UsuariosAPI.Controllers
             if (resultado.IsFailed)
                 return StatusCode(500);
 
-            return Ok();
+            return Ok(resultado.Successes);
+        }
+
+        [HttpPost("/Ativar")]
+        public async Task<IActionResult> AtivarContaUsuario(AtivaContaRequest request)
+        {
+            var resultado = await _cadastroService.AtivarContaUsuario(request);
+
+            if (resultado.IsFailed)
+                return StatusCode(500);
+
+            return Ok(resultado.Successes);
         }
     }
 }
