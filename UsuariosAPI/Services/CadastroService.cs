@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using UsuariosAPI.Data.Dtos;
 using UsuariosAPI.Data.Requests;
 using UsuariosAPI.Models;
@@ -36,7 +37,9 @@ namespace UsuariosAPI.Services
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(usuarioIdentity);
 
-                _emailService.EnviarEmail(new[] { usuarioIdentity.Email }, "Link de Ativação", usuarioIdentity.Id, code);
+                var encodedCode = HttpUtility.UrlEncode(code);
+
+                _emailService.EnviarEmail(new[] { usuarioIdentity.Email }, "Link de Ativação", usuarioIdentity.Id, encodedCode);
 
                 return Result.Ok().WithSuccess(code);
             }

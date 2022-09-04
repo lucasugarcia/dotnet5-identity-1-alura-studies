@@ -32,8 +32,8 @@ namespace UsuariosAPI.Controllers
             return Ok(resultado.Successes);
         }
 
-        [HttpPost("/Ativar")]
-        public async Task<IActionResult> AtivarContaUsuario(AtivaContaRequest request)
+        [HttpGet("/Ativar")]
+        public async Task<IActionResult> AtivarContaUsuario([FromQuery] AtivaContaRequest request)
         {
             var resultado = await _cadastroService.AtivarContaUsuario(request);
 
